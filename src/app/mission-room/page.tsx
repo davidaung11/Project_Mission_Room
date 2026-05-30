@@ -60,7 +60,7 @@ const programs = [
 
 export default function DiscoveryCenterPage() {
   const [activeTab, setActiveTab] = useState<"program" | "scholarship">(
-    "program"
+    "program",
   );
   const [query, setQuery] = useState("");
   const [favorites, setFavorites] = useState<string[]>([]);
@@ -73,7 +73,7 @@ export default function DiscoveryCenterPage() {
     return programs.filter((program) =>
       `${program.title} ${program.university}`
         .toLowerCase()
-        .includes(query.toLowerCase())
+        .includes(query.toLowerCase()),
     );
   }, [query]);
 
@@ -81,7 +81,7 @@ export default function DiscoveryCenterPage() {
     setFavorites((current) =>
       current.includes(title)
         ? current.filter((item) => item !== title)
-        : [...current, title]
+        : [...current, title],
     );
   };
 
@@ -90,7 +90,7 @@ export default function DiscoveryCenterPage() {
       <section className="pt-8 text-center">
         <div className="flex items-center justify-center gap-4">
           <Image
-            src="/medalverse-logo.png"
+            src="/Logo(1).png"
             alt="Medalverse Logo"
             width={48}
             height={48}
@@ -464,9 +464,7 @@ function Info({
 
       <div>
         <p className="text-[11px] text-[#8a8a8a]">{label}</p>
-        <p className="mt-0.5 text-[13px] font-medium text-[#3c3936]">
-          {value}
-        </p>
+        <p className="mt-0.5 text-[13px] font-medium text-[#3c3936]">{value}</p>
       </div>
     </div>
   );
