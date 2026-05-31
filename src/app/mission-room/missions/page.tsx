@@ -1,68 +1,67 @@
 "use client";
 
-import Link from "next/link";
+import { saveMission } from "@/lib/mission-storage";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 const missionPrograms = [
   {
     title: "BBA Chula",
     university: "Chulalongkorn University",
+    category: "Business",
     description: "International business, management, finance, and strategy.",
-    duration: "4 Years",
-    location: "Bangkok, TH",
-    salary: "$95k/yr",
-    ranking: "#1",
-    tuition: "$30k/yr",
-    acceptance: "30%",
     logo: "/logo.png",
   },
   {
     title: "BALAC Chula",
     university: "Chulalongkorn University",
+    category: "Language",
     description: "Language, culture, global communication, and humanities.",
-    duration: "4 Years",
-    location: "Bangkok, TH",
-    salary: "$75k/yr",
-    ranking: "#1",
-    tuition: "$25k/yr",
-    acceptance: "35%",
     logo: "/logo.png",
   },
   {
     title: "JCC Chula",
     university: "Chulalongkorn University",
+    category: "Communication",
     description: "Communication management, media strategy, and digital culture.",
-    duration: "4 Years",
-    location: "Bangkok, TH",
-    salary: "$80k/yr",
-    ranking: "#1",
-    tuition: "$28k/yr",
-    acceptance: "32%",
     logo: "/logo.png",
   },
 ];
 
-const chips = ["International Program", "Business", "Communication", "Language"];
+const chips = ["All", "Business", "Communication", "Language"];
 
 export default function MissionsPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
-  const [activeChip, setActiveChip] = useState("International Program");
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const [activeChip, setActiveChip] = useState("All");
 
   const filteredPrograms = useMemo(() => {
-    return missionPrograms.filter((program) =>
-      `${program.title} ${program.university} ${program.description}`
+    return missionPrograms.filter((program) => {
+      const matchesSearch = `${program.title} ${program.university} ${program.description}`
         .toLowerCase()
-        .includes(search.toLowerCase())
-    );
-  }, [search]);
+        .includes(search.toLowerCase());
 
-  const toggleFavorite = (title: string) => {
-    setFavorites((current) =>
-      current.includes(title)
-        ? current.filter((item) => item !== title)
-        : [...current, title]
-    );
+      const matchesChip =
+        activeChip === "All" || program.category === activeChip;
+
+      return matchesSearch && matchesChip;
+    });
+  }, [search, activeChip]);
+
+  const handleSelectMission = (program: (typeof missionPrograms)[number]) => {
+    saveMission({
+      id: program.title,
+      title: program.title,
+      program: program.description,
+      university: program.university,
+      progress: 5,
+      sessions: 0,
+      tasks: 3,
+      logo: program.logo,
+    });
+
+    router.push("/mission-room/plan");
   };
 
   return (
@@ -73,7 +72,7 @@ export default function MissionsPage() {
         </h1>
 
         <p className="mt-1 text-[12px] text-[var(--mr-muted)]">
-          Choose a program or talk to an expert to build your academic roadmap.
+          Choose a program to create your academic mission roadmap.
         </p>
       </div>
 
@@ -108,85 +107,61 @@ export default function MissionsPage() {
         ))}
       </div>
 
-      {filteredPrograms.length > 0 && (
+      {filteredPrograms.length > 0 ? (
         <div className="grid gap-4 lg:grid-cols-3">
           {filteredPrograms.map((program) => (
             <div
               key={program.title}
-              className="rounded-[16px] border border-[var(--mr-border)] bg-white/90 p-4 shadow-[var(--mr-shadow)]"
+              className="rounded-[18px] border border-[var(--mr-border)] bg-white/90 p-5 shadow-[var(--mr-shadow)]"
             >
-              <div className="mb-4 flex items-start justify-between">
-                <div className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-[#fff5f8] p-2">
-                  <img
-                    src={program.logo}
-                    alt={`${program.title} logo`}
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  aria-label={
-                    favorites.includes(program.title)
-                      ? "Remove from shortlisted"
-                      : "Add to shortlisted"
-                  }
-                  onClick={() => toggleFavorite(program.title)}
-                  className={`flex h-8 w-8 items-center justify-center rounded-full shadow-[var(--mr-shadow)] ${
-                    favorites.includes(program.title)
-                      ? "bg-[#ffeaf1] text-[#ff5b8a]"
-                      : "bg-white text-[#c7d2df]"
-                  }`}
-                >
-                  ♥
-                </button>
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[16px] bg-[#fff5f8] p-2">
+                <Image
+                  src={program.logo}
+                  alt={`${program.title} logo`}
+                  width={48}
+                  height={48}
+                  className="h-full w-full object-contain"
+                />
               </div>
 
-              <h2 className="text-[14px] font-semibold text-[var(--mr-text)]">
+              <h2 className="text-[15px] font-semibold text-[#3c3936]">
                 {program.title}
               </h2>
 
-              <p className="mt-0.5 text-[11px] font-medium text-[var(--mr-blue)]">
+              <p className="mt-1 text-[11px] font-medium text-[var(--mr-blue)]">
                 {program.university}
               </p>
 
-              <p className="mt-2 min-h-[38px] text-[11px] leading-5 text-[var(--mr-muted)]">
+              <span className="mt-3 inline-flex rounded-full bg-[var(--mr-blue-soft)] px-3 py-1 text-[10px] font-semibold text-[var(--mr-blue)]">
+                {program.category}
+              </span>
+
+              <p className="mt-3 min-h-[44px] text-[12px] leading-5 text-[var(--mr-muted)]">
                 {program.description}
               </p>
 
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <Info label="Duration" value={program.duration} />
-                <Info label="Location" value={program.location} />
-                <Info label="Avg. Salary" value={program.salary} />
-                <Info label="Ranking" value={program.ranking} />
-                <Info label="Tuition Fee" value={program.tuition} />
-                <Info label="Acceptance Rate" value={program.acceptance} />
-              </div>
-
-              <Link
-                href="/mission-room/plan"
-                className="mt-4 block rounded-[12px] bg-[var(--mr-blue)] py-2.5 text-center text-[12px] font-semibold text-white"
+              <button
+                type="button"
+                onClick={() => handleSelectMission(program)}
+                className="mt-5 block w-full rounded-[12px] bg-[var(--mr-blue)] py-2.5 text-center text-[12px] font-semibold text-white"
               >
-                Select
-              </Link>
+                Select Program
+              </button>
             </div>
           ))}
         </div>
-      )}
-
-      {filteredPrograms.length === 0 && (
+      ) : (
         <div className="mt-6 flex min-h-[300px] flex-col items-center justify-center rounded-[18px] border border-[var(--mr-border)] bg-white/60">
           <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[var(--mr-border)] bg-white text-[34px] text-[#7f8fa3] shadow-sm">
             🔍
           </div>
 
           <h3 className="mt-5 text-[16px] font-semibold text-[#3c3936]">
-            No results found
+            No programs found
           </h3>
 
           <p className="mt-2 max-w-[320px] text-center text-[12px] leading-6 text-[var(--mr-muted)]">
-            Try adjusting your keywords or use the AI Advisor to discover
-            relevant programs.
+            Try another keyword or choose a different category.
           </p>
         </div>
       )}
@@ -202,25 +177,15 @@ export default function MissionsPage() {
             </p>
           </div>
 
-          <Link
-            href="/mission-room/consultation"
+          <button
+            type="button"
+            onClick={() => router.push("/mission-room/consultation")}
             className="rounded-[12px] bg-[var(--mr-green)] px-5 py-2.5 text-center text-[12px] font-semibold text-[#172033]"
           >
             Book Free Consult
-          </Link>
+          </button>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Info({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-[12px] bg-[#f6faff] p-2.5">
-      <p className="text-[9px] text-[var(--mr-light-muted)]">{label}</p>
-      <p className="mt-0.5 text-[11px] font-semibold text-[var(--mr-text)]">
-        {value}
-      </p>
     </div>
   );
 }

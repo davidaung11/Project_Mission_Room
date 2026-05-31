@@ -1,27 +1,36 @@
 "use client";
 
+import { getSavedMissions, saveMission } from "@/lib/mission-storage";
 import { useRouter } from "next/navigation";
 
-const steps = ["Mission Details", "Curriculum Selection", "Timeline & Setup", "Review & Launch"];
+const steps = [
+  "Mission Details",
+  "Curriculum Selection",
+  "Timeline & Setup",
+  "Review & Launch",
+];
 
 const requirements = [
   {
     title: "Admission Requirements Review",
-    detail: "Check required documents, English score, portfolio, and application timeline.",
+    detail:
+      "Check required documents, English score, portfolio, and application timeline.",
     start: "01/09/2026",
     end: "15/09/2026",
     lessons: 3,
   },
   {
     title: "Portfolio & Essay Preparation",
-    detail: "Prepare statement of purpose, activity record, and portfolio documents.",
+    detail:
+      "Prepare statement of purpose, activity record, and portfolio documents.",
     start: "16/09/2026",
     end: "30/09/2026",
     lessons: 2,
   },
   {
     title: "Interview Practice",
-    detail: "Practice academic interview questions and program-specific answers.",
+    detail:
+      "Practice academic interview questions and program-specific answers.",
     start: "01/10/2026",
     end: "10/10/2026",
     lessons: 1,
@@ -30,6 +39,22 @@ const requirements = [
 
 export default function PlanPage() {
   const router = useRouter();
+
+  const handleGenerateFinalPlan = () => {
+    const missions = getSavedMissions();
+    const latestMission = missions[missions.length - 1];
+
+    if (latestMission) {
+      saveMission({
+        ...latestMission,
+        progress: 65,
+        sessions: 4,
+        tasks: 8,
+      });
+    }
+
+    router.push("/mission-room");
+  };
 
   return (
     <div>
@@ -108,30 +133,9 @@ export default function PlanPage() {
             </div>
           </div>
 
-          <div className="rounded-[16px] border border-[#e8f1fb] bg-white/90 p-4">
-            <h3 className="text-[13px] font-semibold text-[#263445]">
-              September 2026
-            </h3>
-
-            <div className="mt-3 grid grid-cols-7 gap-1 text-center text-[10px] text-[#6e7f94]">
-              {Array.from({ length: 28 }).map((_, index) => (
-                <span
-                  key={index}
-                  className={`rounded-full py-1 ${
-                    [5, 10, 15].includes(index)
-                      ? "bg-[#0b5dcc] text-white"
-                      : "bg-[#f6faff]"
-                  }`}
-                >
-                  {index + 1}
-                </span>
-              ))}
-            </div>
-          </div>
-
           <button
             type="button"
-            onClick={() => router.push("/mission-room/dashboard")}
+            onClick={handleGenerateFinalPlan}
             className="w-full rounded-[12px] bg-[#0b5dcc] py-3 text-[12px] font-semibold text-white"
           >
             Generate Final Plan →

@@ -3,190 +3,172 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import {
-  BookOpen,
+  Bell,
+  CalendarClock,
   Cloud,
-  ClipboardList,
+  Compass,
   Grid3X3,
-  Menu,
-  NotebookPen,
-  Rocket,
+  LayoutDashboard,
+  MessageCircle,
+  Users,
 } from "lucide-react";
+
+function isActive(pathname: string, href: string) {
+  if (href === "/mission-room") {
+    return pathname === "/mission-room";
+  }
+
+  return pathname.startsWith(href);
+}
 
 export default function MissionSidebar() {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(true);
-  const [workspaceOpen, setWorkspaceOpen] = useState(true);
-
-  const isActive = (href: string) => pathname === href;
-  const isWorkspaceActive =
-    pathname === "/mission-room/workspace" ||
-    pathname === "/mission-room/missions" ||
-    pathname === "/mission-room/mentors" ||
-    pathname === "/mission-room/settings";
 
   return (
-    <aside className="flex h-screen bg-white">
-      <div className="flex w-[72px] flex-col items-center border-r border-[var(--mr-border)] py-5">
-        <button
-          type="button"
-          onClick={() => setMenuOpen(true)}
-          className="mb-24"
-          aria-label="Open Mission Room menu"
-        >
+    <aside className="flex h-screen shrink-0 bg-white">
+      {/* Left Rail */}
+      <div className="flex w-[72px] flex-col items-center border-r border-[var(--mr-border)] bg-white px-2 py-5">
+        <Link href="/mission-room">
           <Image
             src="/Logo(1).png"
             alt="Medalverse Logo"
             width={30}
             height={30}
-            className="object-contain"
             priority
           />
-        </button>
+        </Link>
 
-        <div className="space-y-5 text-center">
-          <RailItem label="Credential Cloud" icon={<Cloud size={17} />} />
-          <RailItem label="Mission Room" icon={<Rocket size={17} />} active />
-          <RailItem label="Experience Hub" icon={<Grid3X3 size={17} />} />
+        <div className="mt-28 flex w-full flex-col gap-4">
+          <RailItem icon={<Cloud size={18} />} label="Credential Cloud" />
+
+          <RailItem
+            icon={<Compass size={18} />}
+            label="Mission Room"
+            active
+          />
+
+          <RailItem icon={<Grid3X3 size={18} />} label="Experience Hub" />
         </div>
 
-        <div className="mt-auto flex h-7 w-7 items-center justify-center rounded-full bg-[#343434] text-[10px] text-white">
-          P
+        <div className="mt-auto flex flex-col items-center gap-5">
+          <Bell size={18} className="text-[#3c3936]" />
+
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#343434] text-[11px] font-semibold text-white">
+            D
+          </div>
         </div>
       </div>
 
-      {menuOpen && (
-        <div className="w-[210px] border-r border-[var(--mr-border)] bg-white px-4 py-5">
-          <div className="mb-6 flex items-center justify-between">
-            <h1 className="text-[13px] font-semibold text-[var(--mr-text)]">
-              Mission Room
-            </h1>
-
-            <button
-              type="button"
-              onClick={() => setMenuOpen(false)}
-              className="text-[var(--mr-muted)]"
-              aria-label="Close sidebar"
-            >
-              <Menu size={17} />
-            </button>
+      {/* Mission Menu */}
+      <div className="flex w-[180px] flex-col border-r border-[var(--mr-border)] bg-[#edf4ff] px-3 py-5">
+        <div className="mb-8 flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[10px] bg-[var(--mr-blue)]">
+            <Image
+              src="/Logo(1).png"
+              alt="Mission Logo"
+              width={20}
+              height={20}
+              className="brightness-0 invert"
+            />
           </div>
 
-          <nav className="space-y-2">
-            <Link
-              href="/mission-room"
-              className={`flex items-center gap-2 rounded-[12px] px-3 py-2 text-[11px] ${
-                isActive("/mission-room")
-                  ? "bg-[var(--mr-blue-soft)] font-semibold text-[var(--mr-blue)]"
-                  : "text-[var(--mr-muted)] hover:bg-[#f7fbff]"
-              }`}
-            >
-              <BookOpen size={15} />
-              Discovery Center
-            </Link>
+          <div>
+            <h1 className="text-[18px] font-bold leading-none text-[var(--mr-blue)]">
+              Mission
+            </h1>
 
-            <div>
-              <div className="flex items-center gap-1">
-                <Link
-                  href="/mission-room/workspace"
-                  className={`flex flex-1 items-center gap-2 rounded-[12px] px-3 py-2 text-[11px] whitespace-nowrap ${
-                    isWorkspaceActive
-                      ? "bg-[var(--mr-blue-soft)] font-semibold text-[var(--mr-blue)]"
-                      : "text-[var(--mr-muted)] hover:bg-[#f7fbff]"
-                  }`}
-                >
-                  <Rocket size={15} />
-                  Mission Workspace
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => setWorkspaceOpen(!workspaceOpen)}
-                  className="px-1 text-[var(--mr-muted)]"
-                  aria-label="Toggle Mission Workspace submenu"
-                >
-                  {workspaceOpen ? "⌃" : "⌄"}
-                </button>
-              </div>
-
-              {workspaceOpen && (
-                <div className="mt-1 space-y-1 pl-7">
-                  <SubLink href="/mission-room/missions" label="Missions" />
-                  <SubLink href="/mission-room/mentors" label="Mentors" />
-                  <SubLink href="/mission-room/settings" label="Settings" />
-                </div>
-              )}
-            </div>
-
-            <Link
-              href="/mission-room/plan"
-              className={`flex items-center gap-2 rounded-[12px] px-3 py-2 text-[11px] ${
-                isActive("/mission-room/plan")
-                  ? "bg-[var(--mr-blue-soft)] font-semibold text-[var(--mr-blue)]"
-                  : "text-[var(--mr-muted)] hover:bg-[#f7fbff]"
-              }`}
-            >
-              <ClipboardList size={15} />
-              Smart Planner
-            </Link>
-
-            <Link
-              href="/mission-room/essay-studio"
-              className={`flex items-center gap-2 rounded-[12px] px-3 py-2 text-[11px] ${
-                isActive("/mission-room/essay-studio")
-                  ? "bg-[var(--mr-blue-soft)] font-semibold text-[var(--mr-blue)]"
-                  : "text-[var(--mr-muted)] hover:bg-[#f7fbff]"
-              }`}
-            >
-              <NotebookPen size={15} />
-              Essay Studio
-            </Link>
-          </nav>
+            <p className="mt-1 text-[10px] text-[#3c5f8a]">
+              Digital Mentor
+            </p>
+          </div>
         </div>
-      )}
+
+        <nav className="space-y-2">
+          <MenuItem
+            href="/mission-room"
+            icon={<LayoutDashboard size={15} />}
+            label="Dashboard"
+            active={isActive(pathname, "/mission-room")}
+          />
+
+          <MenuItem
+            href="/mission-room/sessions"
+            icon={<CalendarClock size={15} />}
+            label="Upcoming Session"
+            active={isActive(pathname, "/mission-room/sessions")}
+          />
+
+          <MenuItem
+            href="/mission-room/mentors"
+            icon={<Users size={15} />}
+            label="Mentor Discovery"
+            active={isActive(pathname, "/mission-room/mentors")}
+          />
+
+          {/* Future Chatbot */}
+          <button
+            type="button"
+            className="flex w-full items-center gap-2 rounded-[6px] bg-black px-3 py-3 text-left text-[11px] font-semibold text-white hover:bg-[#172033]"
+          >
+            <MessageCircle size={15} />
+            Talk To Advisor
+          </button>
+        </nav>
+      </div>
     </aside>
   );
 }
 
-function SubLink({ href, label }: { href: string; label: string }) {
-  const pathname = usePathname();
-  const active = pathname === href;
+function RailItem({
+  icon,
+  label,
+  active = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
+}) {
+  const words = label.split(" ");
 
   return (
-    <Link
-      href={href}
-      className={`block rounded-[10px] px-3 py-2 text-[11px] ${
+    <div
+      className={`flex flex-col items-center rounded-[14px] px-2 py-2 text-center text-[10px] ${
         active
           ? "bg-[var(--mr-blue-soft)] font-semibold text-[var(--mr-blue)]"
-          : "text-[var(--mr-muted)] hover:bg-[#f7fbff]"
+          : "text-[#7c8a99]"
       }`}
     >
-      {label}
-    </Link>
+      <div className="mb-1">{icon}</div>
+
+      <p>{words[0]}</p>
+      <p>{words.slice(1).join(" ")}</p>
+    </div>
   );
 }
 
-function RailItem({
-  label,
+function MenuItem({
+  href,
   icon,
-  active,
+  label,
+  active = false,
 }: {
-  label: string;
+  href: string;
   icon: React.ReactNode;
+  label: string;
   active?: boolean;
 }) {
   return (
-    <div
-      className={`rounded-[14px] px-2 py-2 text-[10px] ${
+    <Link
+      href={href}
+      className={`flex items-center gap-2 rounded-[6px] px-3 py-3 text-[11px] font-semibold ${
         active
-          ? "bg-[var(--mr-blue-soft)] font-semibold text-[var(--mr-blue)]"
-          : "text-[var(--mr-muted)]"
+          ? "bg-[var(--mr-blue)] text-white"
+          : "bg-black text-white hover:bg-[#172033]"
       }`}
     >
-      <div className="mb-1 flex justify-center">{icon}</div>
-      <p>{label.split(" ")[0]}</p>
-      <p>{label.split(" ")[1]}</p>
-    </div>
+      {icon}
+      {label}
+    </Link>
   );
 }
